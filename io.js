@@ -1,11 +1,29 @@
 var io = require('socket.io')();
 
-io.sockets.on('connection',function(socket){
+//name spaces set to meetingdocument
+//命名空间设置为meetingdocument
+io.of('/meetingdocument').on('connection',function(socket){
     //socket.emit('news',{hello: 'world'});
-    socket.on('chat message',function (data){
+    socket.on('join document',function (data){
         console.log(data);
-        io.emit('chat message',data);
+
+        socket.room = 'document '+data.documentid;
+
+        socket.join(socket.room);
+
+        socket.emit('join document',data);
     })
+
+    socket.on('document update',function (data){
+        console.log(data);
+
+        socket.room = 'document '+data.documentid;
+
+        socket.broadcast.to(socket.room).emit('document update',data.content);
+
+    })
+
+
 })
 
 module.exports = io;

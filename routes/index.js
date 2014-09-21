@@ -7,8 +7,10 @@ router.get('/', function(req, res) {
 });
 
 /* GET document page. */
-router.get('/document', function(req, res) {
-  res.render('document', { title: 'Express' });
+router.get('/document/:documentid', function(req, res) {
+   
+  /*Send documentid to view*/
+  res.render('document', { documentid: req.params.documentid});
 });
 
 module.exports = router;

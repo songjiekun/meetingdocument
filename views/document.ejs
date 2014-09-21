@@ -22,6 +22,8 @@
     <script src="/js/summernote.min.js"></script>
     <link href="/css/summernote.css" rel="stylesheet"/>
     <link href="/css/summernote-bs3.css" rel="stylesheet"/>
+    <script src="/socket.io/socket.io.js"></script>
+
 
 
 
@@ -52,8 +54,19 @@
 
       <div class="jumbotron">
         <h1>Jumbotron heading</h1>
+        
         <textarea id="summernote" class="form-control">Hello Summernote</textarea>
+
         <p><a class="btn btn-lg btn-success" href="#" role="button">Sign up today</a></p>
+        <div  class="alert alert-warning">
+            
+            <div  id="message">
+            </div>
+        </div>
+        <div  class="alert alert-warning">
+            
+            <div  id="documentid"><%= documentid %></div>
+        </div>
       </div>
 
 
@@ -70,8 +83,9 @@
     
     
     <script>
+     
 
-     $('#summernote').summernote({
+    $('#summernote').summernote({
       height: 500,                 // set editor height
 
       minHeight: null,             // set minimum height of editor
@@ -80,6 +94,32 @@
       focus: true,                 // set focus to editable area after initializing summernote
     });
 
+    
+
+    </script>
+
+    <script>
+    var socket = io('/meetingdocument');
+
+    var documentid = "";
+
+    $(document).ready(function(){
+
+      documentid = $('#documentid').text();
+
+      console.log(documentid);
+
+      socket.emit('join document',{documentid:documentid});
+
+      socket.on('join document',function (data){
+
+        $('#message').text("joined");
+
+
+
+      });
+
+     });
     </script>
   </body>
 </html>
