@@ -94,32 +94,81 @@
       focus: true,                 // set focus to editable area after initializing summernote
     });
 
-    
+    $('#summernote').code(<%= content %>);
+
 
     </script>
 
     <script>
     var socket = io('/meetingdocument');
 
-    var documentid = "";
+    var canupdate = true;
+
+    var documentid = $('#documentid').text();
+
+    var documentcontent = $('#summernote').code();
+
+    //user join to the meeting
+
+    socket.on('join document',function (data){
+
+      $('#message').text("joined");
+
+      //$('#summernote').code(data.content);
+
+    });
+
+    //update document content
+
+    socket.on('document update',function (data){
+
+      canupdate = false;
+
+      $('#summernote').children().prop('disabled',true);
+
+      $('#summernote').code(data);
+
+    });
+
+    //update success message
+
+    socket.on('update success',function (data){
+
+      if (canupdate) {
+
+        $('#message').text("updated!");
+        console.log('test test dddd');
+
+      }
+
+    });
+
+    
 
     $(document).ready(function(){
 
-      documentid = $('#documentid').text();
-
-      console.log(documentid);
-
       socket.emit('join document',{documentid:documentid});
 
-      socket.on('join document',function (data){
-
-        $('#message').text("joined");
-
-
-
-      });
-
      });
+
+    function updatedocument() {
+
+      var newdocumentcontent = $('#summernote').code();
+
+      if (documentcontent!==newdocumentcontent && canupdate) {
+
+        documentcontent = newdocumentcontent;
+
+        socket.emit('document update',{documentid:documentid,content:documentcontent});
+
+        $('#message').text("updating...");
+
+      }
+
+    }
+
+    setInterval(updatedocument,5000); 
+
     </script>
   </body>
 </html>

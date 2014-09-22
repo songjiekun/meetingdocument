@@ -19,7 +19,11 @@ io.of('/meetingdocument').on('connection',function(socket){
 
         socket.room = 'document '+data.documentid;
 
-        socket.broadcast.to(socket.room).emit('document update',data.content);
+        console.log(socket.room);
+
+        socket.to(socket.room).emit('document update',data.content);
+
+        socket.emit('update success',data.content);
 
     })
 
