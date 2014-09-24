@@ -11,8 +11,6 @@ router.get('/', function(req, res) {
 /* POST create document. */
 router.post('/createdocument', function(req, res) {
 
-	//var ObjectId = mongoose.Schema.Types.ObjectId;
-
 	var Owner = req.body.owner;
 
 	var newdocument = new Document({ content : '' , owner : Owner });
@@ -29,7 +27,7 @@ router.post('/createdocument', function(req, res) {
 
     		var DocumentId = doc.id;
 
-    		res.redirect('/document/'+DocumentId);
+    		res.redirect('/document/'+DocumentId+'/'+Owner);
 
     	}
 
@@ -40,7 +38,9 @@ router.post('/createdocument', function(req, res) {
 /* Post enter document. */
 router.post('/enterdocument', function(req, res) {
 
-	var DocumentId = req.body.documentid
+	var DocumentId = req.body.documentid;
+
+	var User = req.body.username;
 
 	Document.findById(DocumentId,function (error,doc){
 
@@ -51,7 +51,7 @@ router.post('/enterdocument', function(req, res) {
 		}
 		else {
 
-			res.redirect('/document/'+DocumentId);
+			res.redirect('/document/'+DocumentId+'/'+User);
 
 		}
 
@@ -61,9 +61,11 @@ router.post('/enterdocument', function(req, res) {
 });
 
 /* GET document page. */
-router.get('/document/:documentid', function(req, res) {
+router.get('/document/:documentid/:user', function(req, res) {
 
 	var DocumentId = req.params.documentid;
+
+	var User = req.params.user;
 
 	Document.findById(DocumentId,function (error,doc){
 
@@ -74,8 +76,24 @@ router.get('/document/:documentid', function(req, res) {
 		}
 		else {
 
+			var Content = doc.content;
+
+			var Owner = doc.owner;
+
+			var IsOwner;
+
+			if (Owner === User) {
+
+				IsOwner = 'true';
+
+			}
+			else {
+
+				IsOwner = 'false';
+			}
+
 			/*Send documentid to view*/
-            res.render('document', { documentid : DocumentId , content : doc.content });
+            res.render('document', { documentid : DocumentId , content : Content , owner : Owner , username : User , isowner : IsOwner });
 
 		}
 

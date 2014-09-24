@@ -1,29 +1,167 @@
 var io = require('socket.io')();
+var Document = require('./models/document');
 
 //name spaces set to meetingdocument
 //命名空间设置为meetingdocument
 io.of('/meetingdocument').on('connection',function(socket){
-    //socket.emit('news',{hello: 'world'});
+
     socket.on('join document',function (data){
         console.log(data);
 
-        socket.room = 'document '+data.documentid;
+        var DocumentId = data.documentid;
+
+        var User = data.username;
+
+        //room's name based on documentid
+
+        socket.room = 'document '+DocumentId;
+
+        //add socket to room
 
         socket.join(socket.room);
 
-        socket.emit('join document',data);
+        Document.findById(DocumentId,function (error,doc){
+
+            if (error) {
+
+                socket.emit('error',{error:'database error'});
+
+            }
+            else {
+
+                doc.users.push(User);
+
+                doc.save(function (error){
+
+                    if (error) {
+
+                        socket.emit('error',{error:'database error'});
+
+                    }
+
+                    else {
+
+                        socket.to(socket.room).emit('userlist update',doc);
+
+                        socket.emit('join document',doc);
+
+                    }
+
+                });
+
+            }
+
+
+        });
+
+    })
+
+    socket.on('leave document',function (data){
+
+        var DocumentId = data.documentid;
+
+        var User = data.username;
+
+        //room's name based on documentid
+
+        socket.room = 'document '+DocumentId;
+
+        // socket leave room
+
+        socket.leave(socket.room);
+
+        Document.findById(DocumentId,function (error,doc){
+
+            if (error) {
+
+                socket.emit('error',{error:'database error'});
+
+            }
+            else {
+
+                //remove user from database
+
+                var i = doc.users.indexOf(User);
+
+                if(i > -1) {
+
+                    doc.users.splice(i,1);
+                }
+
+                //save update
+
+                doc.save(function (error){
+
+                    if (error) {
+
+                        socket.emit('error',{error:'database error'});
+
+                    }
+
+                    else {
+
+                        socket.to(socket.room).emit('userlist update',doc);
+
+                    }
+
+                });
+
+            }
+
+
+        });
+
     })
 
     socket.on('document update',function (data){
+
         console.log(data);
 
-        socket.room = 'document '+data.documentid;
+        var DocumentId = data.documentid;
 
-        console.log(socket.room);
+        var Content = data.content;
 
-        socket.to(socket.room).emit('document update',data.content);
+        socket.room = 'document '+DocumentId;
 
-        socket.emit('update success',data.content);
+        Document.findById(DocumentId,function (error,doc){
+
+            if (error) {
+
+                socket.emit('error',{error:'database error'});
+
+            }
+            else {
+
+                doc.content = Content;
+
+                doc.save(function (error){
+
+                    if (error) {
+
+                        socket.emit('error',{error:'database error'});
+
+                    }
+
+                    else {
+
+                        socket.to(socket.room).emit('document update',doc);
+
+                        socket.emit('update success',doc);
+
+                    }
+
+                });
+
+            }
+
+
+        });
+
+    })
+
+    socket.on('disconnect',function (){
+
+        console.log('disconnect');
 
     })
 
