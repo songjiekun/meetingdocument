@@ -64,10 +64,7 @@
             <div  id="message">
             </div>
           </div>
-          <h3>Document ID</h3>
-          <div  class="alert alert-warning">
-            <div  id="documentid"><%= documentid %></div>
-          </div>
+          
         </div>
 
         <div class="col-xs-6 col-lg-4">
@@ -125,9 +122,9 @@
 
     var canupdate = <%= isowner %>;
 
-    var documentid = $('#documentid').text();
+    var documentid = <%= documentid %>;
 
-    var username = $('#username').text();
+    var username = <%= username %>;
 
     var documentcontent = $('#summernote').code();
 
@@ -170,8 +167,6 @@
     //update document content
 
     socket.on('document update',function (doc){
-
-      $('#summernote').children().prop('disabled',true);
 
       $('#summernote').code(doc.content);
 
