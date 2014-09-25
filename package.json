@@ -13,8 +13,8 @@
     "serve-favicon": "~2.1.3",
     "debug": "~2.0.0",
     "ejs": "~0.8.5",
-    "socket.io": "*",
-    "mongodb": "*",
-    "mongoose": "*"
+    "socket.io": "1.1.0",
+    "mongodb": "1.4.12",
+    "mongoose": "3.8.16"
   }
 }

@@ -29,7 +29,7 @@ io.of('/meetingdocument').on('connection',function(socket){
             }
             else {
 
-                doc.users.push(User);
+                doc.addUser(User);
 
                 doc.save(function (error){
 
@@ -81,12 +81,7 @@ io.of('/meetingdocument').on('connection',function(socket){
 
                 //remove user from database
 
-                var i = doc.users.indexOf(User);
-
-                if(i > -1) {
-
-                    doc.users.splice(i,1);
-                }
+                doc.removeUser(User);
 
                 //save update
 

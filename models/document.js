@@ -7,4 +7,21 @@ var DocumentSchema = new Schema({
 	users: [String]
 });
 
+DocumentScheam.methods.addUser = function (user) {
+
+	this.users.push(user);
+}
+
+DocumentScheam.methods.removeUser = function (user) {
+
+	var i = this.users.indexOf(user);
+
+    if(i > -1) {
+
+        this.users.splice(i,1);
+
+    }
+}
+
+
 module.exports = mongoose.model('Document',DocumentSchema);
