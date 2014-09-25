@@ -7,12 +7,12 @@ var DocumentSchema = new Schema({
 	users: [String]
 });
 
-DocumentScheam.methods.addUser = function (user) {
+DocumentSchema.methods.addUser = function (user) {
 
 	this.users.push(user);
 }
 
-DocumentScheam.methods.removeUser = function (user) {
+DocumentSchema.methods.removeUser = function (user) {
 
 	var i = this.users.indexOf(user);
 
