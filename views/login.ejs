@@ -28,28 +28,18 @@
 
   <body>
 
-    <h2 class="form-signin-heading"><%= user.username %></h2>
-
     <div class="container">
+      <div><%= error %></div>
 
-      <form class="form-signin" action="/createdocument" method="post">
-        <h2 class="form-signin-heading">new document</h2>
-        <input type="text" class="form-control" name="owner" placeholder="Your Name" required autofocus>
+      <form class="form-signin" action="/login" method="post">
+        <h2 class="form-signin-heading">登陆</h2>
+        <input type="text" class="form-control" name="username" placeholder="用户名" required autofocus>
+        <input type="password" class="form-control" name="password" placeholder="密码" required autofocus>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Create</button>
       </form>
 
     </div> <!-- /container -->
 
-    <div class="container">
-
-      <form class="form-signin" action="/enterdocument" method="post">
-        <h2 class="form-signin-heading">enter document</h2>
-        <input type="text" class="form-control" name="username" placeholder="User Name" required autofocus>
-        <input type="text" class="form-control" name="documentid" placeholder="Document ID" required>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Enter</button>
-      </form>
-
-    </div> <!-- /container -->
 
 
     <!-- Bootstrap core JavaScript
