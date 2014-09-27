@@ -13,19 +13,6 @@ var isAuthenticated = function (req,res,next) {
 	res.redirect('/login');
 }
 
-//user login error handler middleware
-var loginErrorHandler = function (error,req,res,next) {
-
-	if (error) {
-		
-		console.log('disconnect');
-		res.render('login',{error : error.message});
-		console.log('disconnect');
-
-	}
-
-	return next();;
-}
 
 /* GET home page. */
 router.get('/', function(req, res) {
