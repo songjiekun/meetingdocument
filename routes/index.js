@@ -5,11 +5,6 @@ var Document = require('../models/document');
 var DocumentUser = require('../models/user');
 var passport = require('passport');
 
-/* GET home page. */
-router.get('/', function(req, res) {
-  res.render('index'/*, { user : req.user }*/);
-});
-
 //check user authentication middleware
 var isAuthenticated = function (req,res,next) {
 
@@ -21,25 +16,51 @@ var isAuthenticated = function (req,res,next) {
 //user login error handler middleware
 var loginErrorHandler = function (error,req,res,next) {
 
-	if (error) res.render('login',{error : error.message});
+	if (error) {
+		
+		console.log('disconnect');
+		res.render('login',{error : error.message});
+		console.log('disconnect');
+
+	}
 
 	return next();;
 }
 
-module.exports = router;
+/* GET home page. */
+router.get('/', function(req, res) {
+    res.render('index', { user : req.user });
+});
 
 /*Login*/
 router.get('/login', function(req, res) {
-  res.render('login');
+    res.render('login',{error:''});
 });
 
-router.post('/login', /*passport.authenticate('local') ,loginErrorHandler,*/ function(req, res) {
-  res.redirect('/');
-});
+router.post('/login', function(req,res,next) {
+
+	passport.authenticate('local',function(error ,user ,info) {
+
+		if (error) {return next(error);}
+
+		if (!user) {console.log(info); return res.render('login',{error:info.message}); }
+
+		req.logIn(user,function(error){
+
+			if (error) { return next(error); }
+
+			return res.redirect('/');
+
+		});
+
+	})(req,res,next); 
+
+}); 
+
 
 /*Registration*/
 router.get('/register', function(req, res) {
-  res.render('register');
+  res.render('register',{error:''});
 });
 
 router.post('/register', function(req, res) {
@@ -58,7 +79,7 @@ router.post('/register', function(req, res) {
 
 /*Logout*/
 router.get('/logout', function(req, res) {
-  res.logout();
+  req.logout();
   res.redirect('/');
 });
 
@@ -66,9 +87,9 @@ router.get('/logout', function(req, res) {
 
 
 /* POST create document. */
-router.post('/createdocument', function(req, res) {
+router.post('/createdocument',isAuthenticated, function(req, res) {
 
-	var Owner = req.body.owner;
+	var Owner = req.user.username;
 
 	var newdocument = new Document({ content : '' , owner : Owner });
 
@@ -84,7 +105,7 @@ router.post('/createdocument', function(req, res) {
 
     		var DocumentId = doc.id;
 
-    		res.redirect('/document/'+DocumentId+'/'+Owner);
+    		res.redirect('/document/'+DocumentId);
 
     	}
 
@@ -93,36 +114,20 @@ router.post('/createdocument', function(req, res) {
 });
 
 /* Post enter document. */
-router.post('/enterdocument', function(req, res) {
+router.post('/enterdocument',isAuthenticated, function(req, res) {
 
 	var DocumentId = req.body.documentid;
 
-	var User = req.body.username;
-
-	Document.findById(DocumentId,function (error,doc){
-
-		if (error) {
-
-			res.send(error);
-
-		}
-		else {
-
-			res.redirect('/document/'+DocumentId+'/'+User);
-
-		}
-
-
-	});
+	res.redirect('/document/'+DocumentId);
 
 });
 
 /* GET document page. */
-router.get('/document/:documentid/:user', /*isAuthenticated ,*/ function(req, res) {
+router.get('/document/:documentid', isAuthenticated , function(req, res) {
 
 	var DocumentId = req.params.documentid;
 
-	var User = req.params.user;
+	var User = req.user.username;
 
 	Document.findById(DocumentId,function (error,doc){
 
@@ -161,6 +166,6 @@ router.get('/document/:documentid/:user', /*isAuthenticated ,*/ function(req, re
 });
 
 
-
+module.exports = router;
 
 

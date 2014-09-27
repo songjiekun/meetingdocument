@@ -29,13 +29,14 @@
   <body>
 
     <div class="container">
-      <div><%= error %></div>
+      <div class="text-center"><% if(error) {%> <%= error %> <% } %></div>
 
       <form class="form-signin" action="/login" method="post">
-        <h2 class="form-signin-heading">登陆</h2>
+        <h2 class="form-signin-heading">登陆页</h2>
         <input type="text" class="form-control" name="username" placeholder="用户名" required autofocus>
         <input type="password" class="form-control" name="password" placeholder="密码" required autofocus>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Create</button>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">登录</button>
+        <a href="/register" class="btn btn-lg btn-primary btn-block">注册新用户</a>
       </form>
 
     </div> <!-- /container -->

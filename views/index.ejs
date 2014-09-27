@@ -28,13 +28,18 @@
 
   <body>
 
-    <h2 class="form-signin-heading"><%= user.username %></h2>
+    <div class="container">
+
+      <h2 class="text-center form-signin-heading"><% if(user && user.username) {%> <%= '你的用户名：'+user.username%> <% } %></h2>
+
+    </div> <!-- /container -->
+
+    
 
     <div class="container">
 
       <form class="form-signin" action="/createdocument" method="post">
         <h2 class="form-signin-heading">new document</h2>
-        <input type="text" class="form-control" name="owner" placeholder="Your Name" required autofocus>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Create</button>
       </form>
 
@@ -44,7 +49,6 @@
 
       <form class="form-signin" action="/enterdocument" method="post">
         <h2 class="form-signin-heading">enter document</h2>
-        <input type="text" class="form-control" name="username" placeholder="User Name" required autofocus>
         <input type="text" class="form-control" name="documentid" placeholder="Document ID" required>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Enter</button>
       </form>
