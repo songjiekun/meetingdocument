@@ -3,8 +3,8 @@ var Schema = mongoose.Schema;
 
 var DocumentSchema = new Schema({
 	content: String,
-	owner: String,
-	users: [String]
+	owner: { type: Schema.Types.ObjectId, ref: 'DocumentUser' , required:true },
+	users: [{ type: Schema.Types.ObjectId, ref: 'DocumentUser'}]
 });
 
 DocumentSchema.methods.addUser = function (user) {

@@ -76,9 +76,10 @@ router.get('/logout', function(req, res) {
 /* POST create document. */
 router.post('/createdocument',isAuthenticated, function(req, res) {
 
-	var Owner = req.user.username;
+	//var Owner = req.user.username;
+	var OwnerId = req.user.id;
 
-	var newdocument = new Document({ content : '' , owner : Owner });
+	var newdocument = new Document({ content : '' , owner : OwnerId });
 
     newdocument.save(function (error,doc){
 
@@ -116,7 +117,11 @@ router.get('/document/:documentid', isAuthenticated , function(req, res) {
 
 	var User = req.user.username;
 
-	Document.findById(DocumentId,function (error,doc){
+	var UserId = req.user.id;
+
+	Document.findById(DocumentId)
+	.populate('owner')
+	.exec(function (error,doc){
 
 		if (error) {
 
@@ -127,11 +132,13 @@ router.get('/document/:documentid', isAuthenticated , function(req, res) {
 
 			var Content = doc.content;
 
-			var Owner = doc.owner;
+			var OwnerId = doc.owner.id;
+
+			var Owner = doc.owner.username;
 
 			var IsOwner;
 
-			if (Owner === User) {
+			if (OwnerId === UserId) {
 
 				IsOwner = 'true';
 
@@ -142,7 +149,7 @@ router.get('/document/:documentid', isAuthenticated , function(req, res) {
 			}
 
 			/*Send documentid to view*/
-            res.render('document', { documentid : DocumentId , content : Content , owner : Owner , username : User , isowner : IsOwner });
+            res.render('document', { documentid : DocumentId , content : Content , owner : Owner , username : User ,userid : UserId , isowner : IsOwner });
 
 		}
 

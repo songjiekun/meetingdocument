@@ -10,7 +10,7 @@ io.of('/meetingdocument').on('connection',function(socket){
 
         var DocumentId = data.documentid;
 
-        var User = data.username;
+        var UserId = data.userid;
 
         //room's name based on documentid
 
@@ -29,7 +29,10 @@ io.of('/meetingdocument').on('connection',function(socket){
             }
             else {
 
-                doc.addUser(User);
+                console.log(doc.users);
+                console.log(doc.owner);
+
+                doc.addUser(UserId);
 
                 doc.save(function (error){
 
@@ -41,9 +44,26 @@ io.of('/meetingdocument').on('connection',function(socket){
 
                     else {
 
-                        socket.to(socket.room).emit('userlist update',doc);
+                        Document.findById(DocumentId)
+                        .populate('owner users')
+                        .exec(function (error,doc){
 
-                        socket.emit('join document',doc);
+
+                            if (error) {
+
+                                socket.emit('error',{error:'database error'});
+
+                            }
+
+                            else {
+
+                                socket.to(socket.room).emit('userlist update',doc);
+
+                                socket.emit('join document',doc);
+
+                            }
+
+                        })                       
 
                     }
 
@@ -60,7 +80,7 @@ io.of('/meetingdocument').on('connection',function(socket){
 
         var DocumentId = data.documentid;
 
-        var User = data.username;
+        var UserId = data.userid;
 
         //room's name based on documentid
 
@@ -81,7 +101,7 @@ io.of('/meetingdocument').on('connection',function(socket){
 
                 //remove user from database
 
-                doc.removeUser(User);
+                doc.removeUser(UserId);
 
                 //save update
 
@@ -95,7 +115,24 @@ io.of('/meetingdocument').on('connection',function(socket){
 
                     else {
 
-                        socket.to(socket.room).emit('userlist update',doc);
+                        Document.findById(DocumentId)
+                        .populate('owner users')
+                        .exec( function(error,doc){
+
+                            if (error) {
+
+                                socket.emit('error',{error:'database error'});
+
+                            }
+
+                            else {
+
+                                socket.to(socket.room).emit('userlist update',doc);
+
+                            }
+
+
+                        })                      
 
                     }
 
@@ -118,7 +155,9 @@ io.of('/meetingdocument').on('connection',function(socket){
 
         socket.room = 'document '+DocumentId;
 
-        Document.findById(DocumentId,function (error,doc){
+        Document.findById(DocumentId)
+        .populate('owner users')
+        .exec(function (error,doc){
 
             if (error) {
 

@@ -126,6 +126,8 @@
 
     var username = '<%= username %>';
 
+    var userid = '<%= userid %>';
+
     var documentcontent = $('#summernote').code();
 
     //user join to the meeting
@@ -182,13 +184,13 @@
 
     $(window).on('beforeunload' , function(){
 
-      socket.emit('leave document',{ documentid : documentid , username : username });
+      socket.emit('leave document',{ documentid : documentid , username : username , userid : userid });
 
     });
 
     $(document).ready(function(){
 
-      socket.emit('join document',{ documentid : documentid , username : username });
+      socket.emit('join document',{ documentid : documentid , username : username , userid : userid });
 
      });
 
@@ -200,7 +202,7 @@
 
       $.each( users , function (index,item) {
 
-        userList += '<div>' + item + '</div>';
+        userList += '<div>' + item.username + '</div>';
 
       });
 
