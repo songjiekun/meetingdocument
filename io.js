@@ -29,12 +29,14 @@ io.of('/meetingdocument').on('connection',function(socket){
             }
             else {
 
-                console.log(doc.users);
-                console.log(doc.owner);
 
-                doc.addUser(UserId);
+                var isadded = doc.addUser(UserId);
 
-                doc.save(function (error){
+                //如果添加成功就更新客户端用户列表
+
+                if (isadded) {
+
+                   doc.save(function (error){
 
                     if (error) {
 
@@ -44,9 +46,7 @@ io.of('/meetingdocument').on('connection',function(socket){
 
                     else {
 
-                        Document.findById(DocumentId)
-                        .populate('owner users')
-                        .exec(function (error,doc){
+                        doc.populate('owner users',function (error,doc){
 
 
                             if (error) {
@@ -67,20 +67,42 @@ io.of('/meetingdocument').on('connection',function(socket){
 
                     }
 
-                });
+                }); 
 
+
+               }
+               else {
+
+                doc.populate('owner users',function (error,doc){
+
+
+                    if (error) {
+
+                        socket.emit('error',{error:'database error'});
+
+                    }
+
+                    else {
+
+                        socket.emit('join document',doc);
+
+                    }
+
+                }) 
+                
             }
 
+        }
 
-        });
+    });
 
-    })
+})
 
-    socket.on('leave document',function (data){
+socket.on('leave document',function (data){
 
-        var DocumentId = data.documentid;
+    var DocumentId = data.documentid;
 
-        var UserId = data.userid;
+    var UserId = data.userid;
 
         //room's name based on documentid
 
@@ -115,9 +137,7 @@ io.of('/meetingdocument').on('connection',function(socket){
 
                     else {
 
-                        Document.findById(DocumentId)
-                        .populate('owner users')
-                        .exec( function(error,doc){
+                        doc.populate('owner users', function(error,doc){
 
                             if (error) {
 
@@ -145,59 +165,59 @@ io.of('/meetingdocument').on('connection',function(socket){
 
     })
 
-    socket.on('document update',function (data){
+socket.on('document update',function (data){
 
-        console.log(data);
+    console.log(data);
 
-        var DocumentId = data.documentid;
+    var DocumentId = data.documentid;
 
-        var Content = data.content;
+    var Content = data.content;
 
-        socket.room = 'document '+DocumentId;
+    socket.room = 'document '+DocumentId;
 
-        Document.findById(DocumentId)
-        .populate('owner users')
-        .exec(function (error,doc){
+    Document.findById(DocumentId)
+    .populate('owner users')
+    .exec(function (error,doc){
 
-            if (error) {
+        if (error) {
 
-                socket.emit('error',{error:'database error'});
+            socket.emit('error',{error:'database error'});
 
-            }
-            else {
+        }
+        else {
 
-                doc.content = Content;
+            doc.content = Content;
 
-                doc.save(function (error){
+            doc.save(function (error){
 
-                    if (error) {
+                if (error) {
 
-                        socket.emit('error',{error:'database error'});
+                    socket.emit('error',{error:'database error'});
 
-                    }
+                }
 
-                    else {
+                else {
 
-                        socket.to(socket.room).emit('document update',doc);
+                    socket.to(socket.room).emit('document update',doc);
 
-                        socket.emit('update success',doc);
+                    socket.emit('update success',doc);
 
-                    }
+                }
 
-                });
+            });
 
-            }
+        }
 
 
-        });
+    });
 
-    })
+})
 
-    socket.on('disconnect',function (){
+socket.on('disconnect',function (){
 
-        console.log('disconnect');
+    console.log('disconnect');
 
-    })
+})
 
 
 })

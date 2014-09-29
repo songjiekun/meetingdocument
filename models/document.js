@@ -7,14 +7,23 @@ var DocumentSchema = new Schema({
 	users: [{ type: Schema.Types.ObjectId, ref: 'DocumentUser'}]
 });
 
-DocumentSchema.methods.addUser = function (user) {
+DocumentSchema.methods.addUser = function (userid) {
 
-	this.users.push(user);
+	//确保没有重复添加用户
+
+	for (var i=0; i<this.users.length;i++) {
+
+		if (String(this.users[i]) == String(userid)) return false;
+	}
+
+	this.users.push(userid);
+
+	return true;
 }
 
-DocumentSchema.methods.removeUser = function (user) {
+DocumentSchema.methods.removeUser = function (userid) {
 
-	var i = this.users.indexOf(user);
+	var i = this.users.indexOf(userid);
 
     if(i > -1) {
 
