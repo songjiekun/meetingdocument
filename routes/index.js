@@ -13,6 +13,32 @@ var isAuthenticated = function (req,res,next) {
 	res.redirect('/login');
 }
 
+//facebook login
+router.get('/facebook/login', passport.authenticate('facebook',{ scope:'email'}));
+
+router.get('/facebook/callback', function(req,res,next) {
+
+	passport.authenticate('facebook',function(error ,user ,info) {
+
+		if (error) {return next(error);}
+
+		if (!user) {console.log(info); return res.render('login',{error:info.message}); }
+
+		req.logIn(user,function(error){
+
+			if (error) { return next(error); }
+
+			if (req.session.newu) console.log("new user!!!!");
+
+			return res.redirect('/');
+
+		});
+
+	})(req,res,next); 
+
+}); 
+
+
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -30,7 +56,7 @@ router.post('/login', function(req,res,next) {
 
 		if (error) {return next(error);}
 
-		if (!user) {console.log(info); return res.render('login',{error:info.message}); }
+		if (!user) {return res.render('login',{error:info.message}); }
 
 		req.logIn(user,function(error){
 
