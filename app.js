@@ -65,6 +65,8 @@ function(req,accessToken,refreshToken,profile,done){
 
         }
 
+        //没有找到对应的用户就新建一个用户
+
         var newuser = new DocumentUser();
         newuser.username = profile.emails[0].value; //can this be unique??
         newuser.facebook.profileid = profile.id;
@@ -75,6 +77,7 @@ function(req,accessToken,refreshToken,profile,done){
             if (error) return done(error);
 
             //new user
+            //标记新建了一个用户
             req.session.newu = true;
             return done(null, newuser); 
 

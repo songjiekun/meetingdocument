@@ -6,6 +6,7 @@ var DocumentUser = require('../models/user');
 var passport = require('passport');
 
 //check user authentication middleware
+//用来判断是否已经登录的中间件
 var isAuthenticated = function (req,res,next) {
 
 	if (req.isAuthenticated()) return next();
