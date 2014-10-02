@@ -13,10 +13,22 @@ var isAuthenticated = function (req,res,next) {
 	res.redirect('/login');
 }
 
-//facebook login
-router.get('/facebook/login', passport.authenticate('facebook',{ scope:'email'}));
+var isNotAuthenticated = function (req,res,next) {
+
+	if (req.isAuthenticated()) res.redirect('/');
+
+	return next();
+
+}
+
+//facebook login or connect
+router.get('/facebook/login', isNotAuthenticated , passport.authenticate('facebook',{ scope:'email'}));
+
+router.get('/facebook/connect', isAuthenticated, passport.authenticate('facebook',{ scope:'email'}));
 
 router.get('/facebook/callback', function(req,res,next) {
+
+	
 
 	passport.authenticate('facebook',function(error ,user ,info) {
 
@@ -24,15 +36,26 @@ router.get('/facebook/callback', function(req,res,next) {
 
 		if (!user) {console.log(info); return res.render('login',{error:info.message}); }
 
-		req.logIn(user,function(error){
+		if (req.isAuthenticated()) {
 
-			if (error) { return next(error); }
+			return res.redirect('/'); //已经登录，说明是authorization，返回授权成功信息
 
-			if (req.session.newu) console.log("new user!!!!");
+		} 
+		else {
 
-			return res.redirect('/');
+			req.logIn(user,function(error){
 
-		});
+				if (error) { return next(error); }
+
+				if (req.session.newu) console.log("new user!!!!");
+
+				return res.redirect('/'); //刚登录，说明是authentication，返回登录认证成功信息
+
+			});
+
+		}
+
+		
 
 	})(req,res,next); 
 
@@ -42,15 +65,15 @@ router.get('/facebook/callback', function(req,res,next) {
 
 /* GET home page. */
 router.get('/', function(req, res) {
-    res.render('index', { user : req.user });
+	res.render('index', { user : req.user });
 });
 
 /*Login*/
-router.get('/login', function(req, res) {
-    res.render('login',{error:''});
+router.get('/login', isNotAuthenticated , function(req, res) {
+	res.render('login',{error:''});
 });
 
-router.post('/login', function(req,res,next) {
+router.post('/login', isNotAuthenticated , function(req,res,next) {
 
 	passport.authenticate('local',function(error ,user ,info) {
 
@@ -72,28 +95,28 @@ router.post('/login', function(req,res,next) {
 
 
 /*Registration*/
-router.get('/register', function(req, res) {
-  res.render('register',{error:''});
+router.get('/register', isNotAuthenticated , function(req, res) {
+	res.render('register',{error:''});
 });
 
-router.post('/register', function(req, res) {
-  DocumentUser.register(new DocumentUser({username : req.body.username}), req.body.password , function(error , documentuser ){
-  	if (error) {
+router.post('/register', isNotAuthenticated , function(req, res) {
+	DocumentUser.register(new DocumentUser({username : req.body.username}), req.body.password , function(error , documentuser ){
+		if (error) {
 
-  		return res.render('register',{ error : error.message });
+			return res.render('register',{ error : error.message });
 
-  	}
+		}
 
-  	res.redirect('/');
+		res.redirect('/');
 
 
-  })
+	})
 });
 
 /*Logout*/
 router.get('/logout', function(req, res) {
-  req.logout();
-  res.redirect('/');
+	req.logout();
+	res.redirect('/');
 });
 
 
@@ -107,23 +130,23 @@ router.post('/createdocument',isAuthenticated, function(req, res) {
 
 	var newdocument = new Document({ content : '' , owner : OwnerId });
 
-    newdocument.save(function (error,doc){
+	newdocument.save(function (error,doc){
 
-    	if (error) {
+		if (error) {
 
-    		res.send(error);
+			res.send(error);
 
-    	}
+		}
 
-    	else {
+		else {
 
-    		var DocumentId = doc.id;
+			var DocumentId = doc.id;
 
-    		res.redirect('/document/'+DocumentId);
+			res.redirect('/document/'+DocumentId);
 
-    	}
+		}
 
-    });
+	});
 
 });
 
@@ -175,14 +198,14 @@ router.get('/document/:documentid', isAuthenticated , function(req, res) {
 			}
 
 			/*Send documentid to view*/
-            res.render('document', { documentid : DocumentId , content : Content , owner : Owner , username : User ,userid : UserId , isowner : IsOwner });
+			res.render('document', { documentid : DocumentId , content : Content , owner : Owner , username : User ,userid : UserId , isowner : IsOwner });
 
 		}
 
 
 	});
-   
-    
+
+
 });
 
 

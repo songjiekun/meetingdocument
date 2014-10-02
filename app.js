@@ -82,7 +82,6 @@ function(req,accessToken,refreshToken,profile,done){
 
     }
 
-
 }
 
 else {
