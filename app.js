@@ -46,16 +46,16 @@ passport.serializeUser(DocumentUser.serializeUser());
 passport.deserializeUser(DocumentUser.deserializeUser());
 //facebook passport
 passport.use(new FacebookStrategy({
-    clientId:'',
-    clientSecret:'',
+    clientID:'33',
+    clientSecret:'33',
     callbackUrl:"/facebook/callback",
     passReqToCallback:true
 },
 function(req,accessToken,refreshToken,profile,done){
 
     if (!req.user) {
-      // Not logged-in.
-      DocumentUser.findOne({ facebook.profileid: profile.id }, function(error, user) {
+      // Not logged-in.nested 成员变量 需要加引号
+      DocumentUser.findOne({ "facebook.profileid": profile.id }, function(error, user) {
 
         if (error) { return done(error); }
 
@@ -83,11 +83,11 @@ function(req,accessToken,refreshToken,profile,done){
 
         });
 
-    }
+    });
 
-}
+  }
 
-else {
+  else {
       // Logged in. Associate facebook account with user.  Preserve the login
       // state by supplying the existing user after association.
       // return done(null, req.user);
