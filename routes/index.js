@@ -67,6 +67,7 @@ router.get('/facebook/callback', function(req,res,next) {
 /* GET home page. */
 router.get('/', function(req, res) {
 	res.render('index', { user : req.user });
+	console.log('this is processid ' + process.pid);
 });
 
 /*Login*/
